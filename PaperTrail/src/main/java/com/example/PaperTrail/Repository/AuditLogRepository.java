@@ -8,9 +8,9 @@ import java.util.List;
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
 
 //    Retrieve audit trails for a specific users.
-    List<AuditLog> findByUserIdGroupByTimestampDesc(String userId);
+    List<AuditLog> findByUserIdOrderByTimestampDesc(String userId);
 
 //    Retrieve Logs filtered By severe action
-    List<AuditLog> findByActionGroupByTimestampDesc(String  action);
+    List<AuditLog> findByActionOrderByTimestampDesc(String  action);
 
 }

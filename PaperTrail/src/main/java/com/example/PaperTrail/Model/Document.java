@@ -21,7 +21,7 @@ public class Document {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "owner_id")
-    private User user;
+    private User owner;
 
     @Column(name ="original_fileName", nullable = false)
     private String originalFileName;
