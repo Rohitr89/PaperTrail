@@ -30,7 +30,7 @@ public class FileStorageService {
     /**
      * Boot-Time Verification:
      * Guarantees the storage directory physically exists before the system accepts traffic.
-     * Prevents runtime FileNotFoundExceptions.
+     * Prevents runtime FileNot FoundExceptions.
      */
     @PostConstruct
     public void init(){
