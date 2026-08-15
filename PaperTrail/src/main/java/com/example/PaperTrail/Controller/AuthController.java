@@ -23,11 +23,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
     private final UserRepository userRepository;
     private final JwtUtils jwtUtils;
+    private final PasswordEncoder passwordEncoder;
 
     // BCrypt one-way hashes passwords — you can check a password against it, but never reverse it.
     // Instantiated directly here for now since SecurityConfig (where this normally lives as a shared bean)
     // doesn't exist yet. We'll move it there once that file exists.
-    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest request){
