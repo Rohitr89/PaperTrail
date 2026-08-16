@@ -59,7 +59,7 @@ public class DocumentShareService {
         }
 
 //      5. Update Permission if document already shared or create new DocumentShare entry
-        DocumentShare share = documentShareRepository.findByDocumentIdAndSharedWithUserId(documentId, recipientUsername)
+        DocumentShare share = documentShareRepository.findByDocumentIdAndSharedWithUserId(documentId, recipient.getId())
                 .orElseGet(() -> DocumentShare.builder()
                         .document(document)
                         .sharedWithUser(recipient)

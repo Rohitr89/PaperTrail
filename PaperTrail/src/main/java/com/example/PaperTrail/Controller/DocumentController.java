@@ -50,14 +50,25 @@ public class DocumentController {
                 .body(rawBytes);
     }
 
-/**
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteFile(
+            @PathVariable("id") String documentId,
+            @AuthenticationPrincipal User currentUser) throws IOException{
+        documentService.deleteDocument(documentId,currentUser);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
         * SECURE LISTING ENDPOINT
-     * Fetches all metadata maps belonging strictly to the currently logged-in user.
-            * Prevents cross-tenant leak vectors because we resolve IDs directly from the secure authentication context.
-     * * How it works conceptually:
-            * - Frontend makes an HTTP GET request to "/api/documents" with their JWT attached.
-            * - `@AuthenticationPrincipal` intercepts the request and extracts the verified User object.
-     * - We pass `currentUser.getId()` to our query method to retrieve ONLY their items.
+        * Fetches all metadata maps belonging strictly to the currently logged-in user.
+        * Prevents cross-tenant leak vectors because we resolve IDs directly from the secure authentication context.
+    */
+
+    /**
+        * * How it works conceptually:
+        * - Frontend makes an HTTP GET request to "/api/documents" with their JWT attached.
+        * - `@AuthenticationPrincipal` intercepts the request and extracts the verified User object.
+        * - We pass `currentUser.getId()` to our query method to retrieve ONLY their items.
      */
     @GetMapping
     public ResponseEntity<List<Document>> listMyDocuments(@AuthenticationPrincipal User currentUser) {
