@@ -59,12 +59,6 @@ public class DocumentController {
     }
 
     /**
-        * SECURE LISTING ENDPOINT
-        * Fetches all metadata maps belonging strictly to the currently logged-in user.
-        * Prevents cross-tenant leak vectors because we resolve IDs directly from the secure authentication context.
-    */
-
-    /**
         * * How it works conceptually:
         * - Frontend makes an HTTP GET request to "/api/documents" with their JWT attached.
         * - `@AuthenticationPrincipal` intercepts the request and extracts the verified User object.
