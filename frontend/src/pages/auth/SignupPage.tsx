@@ -1,0 +1,152 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { api } from '@/api/axiosInstance';
+import { motion } from 'framer-motion';
+import { useSoundStore } from '@/store/soundStore';
+import { UserPlus, Lock } from 'lucide-react';
+import { toast } from 'sonner';
+
+export default function SignupPage() {
+  const [formData, setFormData] = useState({ username: '', password: '', role: 'USER' });
+  const [isLoading, setIsLoading] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<{ score: number, label: string, color: string } | null>(null);
+  const navigate = useNavigate();
+  const playSound = useSoundStore((state) => state.play);
+
+  useEffect(() => {
+    const password = formData.password;
+    if (!password) {
+      setPasswordStrength(null);
+      return;
+    }
+
+    let score = 0;
+    let label = 'Too Weak';
+    let color = 'text-red-500';
+
+    if (password.length >= 6) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+
+    if (score === 1) { label = 'Weak'; color = 'text-orange-500'; }
+    else if (score === 2) { label = 'Medium'; color = 'text-yellow-500'; }
+    else if (score === 3) { label = 'Strong'; color = 'text-green-400'; }
+    else if (score === 4) { label = 'Very Strong'; color = 'text-emerald-400'; }
+
+    setPasswordStrength({ score, label, color });
+  }, [formData.password]);
+
+  const handleSignup = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!passwordStrength || passwordStrength.score < 2) {
+      playSound('ERROR');
+      toast.error('Password is too weak. Please make it stronger!');
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await api.post('/auth/register', formData);
+      playSound('SUCCESS');
+      toast.success('Account initialized successfully!');
+      navigate('/login');
+    } catch (error: any) {
+      playSound('ERROR');
+      toast.error(error.response?.data?.message || 'Registration failed. User might already exist.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="relative flex items-center justify-center min-h-screen bg-[#f6f9fc] text-[#1a1f36]">
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[600px] h-[600px] bg-indigo-100 rounded-full blur-[120px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[800px] h-[800px] bg-blue-100 rounded-full blur-[120px]" />
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="z-10 w-full max-w-md p-4"
+      >
+        <div className="bg-white rounded-3xl shadow-2xl border border-slate-100 p-8">
+          <div className="text-center mb-10">
+            <div className="inline-flex p-3 bg-indigo-50 text-indigo-600 rounded-2xl mb-4">
+              <UserPlus className="h-8 w-8" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Create Identity</h1>
+            <p className="text-slate-500 mt-2">Join the PaperTrail secure network</p>
+          </div>
+
+          <form onSubmit={handleSignup} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-700">Username</label>
+              <div className="relative">
+                <UserPlus className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <input
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  type="text"
+                  placeholder="Choose a unique username"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-semibold text-slate-700">Security Password</label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                <input
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  required
+                />
+              </div>
+
+              {passwordStrength && (
+                <div className="mt-3 px-1">
+                  <div className="flex justify-between items-center mb-2">
+                    <span className={`text-xs font-bold uppercase ${passwordStrength.color}`}>{passwordStrength.label}</span>
+                    <span className="text-xs text-slate-500">{passwordStrength.score}/4</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all duration-500 ${
+                        passwordStrength.score <= 1 ? 'bg-red-500' :
+                        passwordStrength.score === 2 ? 'bg-orange-500' :
+                        passwordStrength.score === 3 ? 'bg-yellow-500' : 'bg-emerald-500'
+                      }`}
+                      style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button
+              className="w-full py-4 rounded-xl bg-indigo-600 text-white font-bold text-lg shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition-all active:scale-95"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Initializing...' : 'Begin Registration'}
+            </button>
+          </form>
+
+          <div className="mt-8 text-center text-sm text-slate-500">
+            Already have an identity?{' '}
+            <Link to="/login" className="text-indigo-600 hover:text-indigo-500 font-bold transition-colors">
+              Access Vault
+            </Link>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
