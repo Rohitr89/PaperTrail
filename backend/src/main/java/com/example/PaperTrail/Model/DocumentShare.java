@@ -30,7 +30,7 @@ public class DocumentShare {
     private User sharedWithUser;
 
     @Column(name = "permission_level", length = 10, nullable = false)
-    private String PermissionLevel;
+    private String permissionLevel; // Changed from PermissionLevel to permissionLevel
 
     @CreationTimestamp
     @Column(name = "shared_at", nullable = false, updatable = false)

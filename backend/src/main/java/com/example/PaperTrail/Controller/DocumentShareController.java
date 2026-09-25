@@ -14,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/shares")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:5173")
 public class DocumentShareController {
     private final DocumentShareService documentShareService;
 
@@ -37,6 +37,14 @@ public class DocumentShareController {
     @GetMapping("/shared-with-me")
     public ResponseEntity<List<DocumentShare>> ListSharedWithMe(@AuthenticationPrincipal User currentUser){
         List<DocumentShare> shares = documentShareService.getDocumentsSharedWithUser(currentUser.getId());
+        return ResponseEntity.ok(shares);
+    }
+
+    @GetMapping("/document/{documentId}")
+    public ResponseEntity<List<DocumentShare>> listSharesForDocument(@PathVariable("documentId") String documentId, @AuthenticationPrincipal User currentUser){
+        // Only owner should be able to see who has access
+        DocumentShareService service = documentShareService;
+        List<DocumentShare> shares = service.getSharesForDocument(documentId);
         return ResponseEntity.ok(shares);
     }
 

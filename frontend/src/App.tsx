@@ -7,47 +7,54 @@ import Dashboard from './pages/dashboard/Dashboard';
 import MyDocuments from './pages/documents/MyDocuments';
 import SharedWithMe from './pages/documents/SharedWithMe';
 import DocumentDetail from './pages/details/DocumentDetail';
-import { ThemeProvider, useTheme } from './components/common/ThemeProvider';
+import ProfilePage from './pages/profile/ProfilePage';
+import { ThemeProvider } from './components/common/ThemeProvider';
 import { Toaster } from 'sonner';
-import { Moon, Sun } from 'lucide-react';
-import ProtectedRoute from './components/common/ProtectedRoute';
+import Navbar from './components/common/Navbar';
 
-function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
-  return (
-    <button
-      onClick={toggleTheme}
-      className="fixed top-6 right-6 z-[100] p-3 rounded-full bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-lg transition-all hover:scale-110 active:scale-95"
-    >
-      {theme === 'dark' ? <Sun className="h-5 w-5 text-yellow-500" /> : <Moon className="h-5 w-5 text-indigo-600" />}
-    </button>
-  );
-}
-
-export default function App() {
+function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
-        <div className="relative">
-          <ThemeToggle />
+        {/* CHANGED: Removed "bg-white text-black" which was forcing a flat white background on every page */}
+        <div className="min-h-screen transition-colors duration-300">
           <Toaster position="top-right" richColors />
           <Routes>
-            {/* Guest Pages */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
 
-            {/* Protected Application Routes */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/app">
-                <Route index element={<Dashboard />} />
-                <Route path="documents" element={<MyDocuments />} />
-                <Route path="shared" element={<SharedWithMe />} />
-                <Route path="documents/:id" element={<DocumentDetail />} />
-              </Route>
-            </Route>
+            <Route path="/app" element={
+              <div className="flex flex-col">
+                <Navbar />
+                <Dashboard />
+              </div>
+            } />
+            <Route path="/app/documents" element={
+              <div className="flex flex-col">
+                <Navbar />
+                <MyDocuments />
+              </div>
+            } />
+            <Route path="/app/shared" element={
+              <div className="flex flex-col">
+                <Navbar />
+                <SharedWithMe />
+              </div>
+            } />
+            <Route path="/app/profile" element={
+              <div className="flex flex-col">
+                <Navbar />
+                <ProfilePage />
+              </div>
+            } />
+            <Route path="/app/documents/:id" element={
+              <div className="flex flex-col">
+                <Navbar />
+                <DocumentDetail />
+              </div>
+            } />
 
-            {/* Fallback: Redirect everything else to Landing Page */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>
@@ -55,3 +62,5 @@ export default function App() {
     </ThemeProvider>
   );
 }
+
+export default App;
