@@ -1,0 +1,28 @@
+services:
+  papertrail_db:
+    image: mysql:8.0
+    container_name: papertrail-db-container
+    environment:
+      MYSQL_DATABASE: papertrail
+      MYSQL_ROOT_PASSWORD: 1234
+    ports:
+      - "3306:3306"
+    volumes:
+        - mysql_data/var/lib/mysql
+
+  backend:
+    build: ./backend
+    container_name: papertrail-backend-container
+    ports:
+      - "1234:1234"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://papertrail_db:3306/papertrail
+      VAULT_STORAGE_DIRECTORY: /app/papertrail_vault_storage
+    volumes:
+      - vault_data:/app/papertrail_vault_storage
+    depends_on:
+      - papertrail_db
+
+volumes:
+  mysql_data:
+  vault_data:
