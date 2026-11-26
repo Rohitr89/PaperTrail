@@ -14,7 +14,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/shares")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = {"http://localhost:5173", "http://localhost"})
 public class DocumentShareController {
     private final DocumentShareService documentShareService;
 

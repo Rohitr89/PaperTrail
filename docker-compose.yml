@@ -30,6 +30,13 @@ services:
       papertrail_db:
         condition: service_healthy
 
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
 volumes:
   mysql_data:
   vault_data:
